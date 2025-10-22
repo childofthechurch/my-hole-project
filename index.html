@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hole Depth Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            max-width: 1200px;
+            width: 100%;
+            animation: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        .controls {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            flex-direction: column;
+        }
+
+        .hole-input-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        label {
+            font-size: 1em;
+            color: #000000;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            text-transform: lowercase;
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #333;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="number"] {
+            padding: 0;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 0;
+            width: auto;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+            background: none;
+            text-align: center;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+        }
+
+        input[type="number"]:hover {
+            
+        }
+
+        .save-button {
+            padding: 12px 32px;
+            font-size: 0.9em;
+            background: transparent;
+            color: #000000;
+            border: 1px solid #000000;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            box-shadow: none;
+            letter-spacing: 0.05em;
+            text-transform: lowercase;
+        }
+
+        .save-button:hover {
+            background: #000000;
+            color: #ffffff;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .save-button:active {
+            transform: none;
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            padding: 10px 15px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 120px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .depth-display {
+            display: none;
+        }
+
+        .visualization {
+            background: transparent;
+            border-radius: 0;
+            padding: 60px 0;
+            position: relative;
+            overflow: visible;
+            min-height: 450px;
+            box-shadow: none;
+            border: none;
+        }
+
+        .ground-layer {
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 60%, #8B7355 60%, #8B7355 100%);
+            height: 150px;
+            position: relative;
+            border-radius: 0;
+            overflow: hidden;
+            margin-bottom: 0;
+            width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .grass-layer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: linear-gradient(to bottom, #2E7D32 0%, #1B5E20 100%);
+        }
+
+        .grass-blades {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: repeating-linear-gradient(
+                90deg,
+                #4CAF50 0px,
+                #4CAF50 3px,
+                #66BB6A 3px,
+                #66BB6A 6px,
+                #81C784 6px,
+                #81C784 9px
+            );
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 0;
+        }
+
+        .tree-trunk {
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to right, #5D4037 0%, #6D4C41 50%, #5D4037 100%);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 3px;
+        }
+
+        .tree-leaves {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #388E3C 0%, #2E7D32 100%);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .tree-leaves::before,
+        .tree-leaves::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #43A047 0%, #388E3C 100%);
+            border-radius: 50%;
+        }
+
+        .tree-leaves::before {
+            top: -20px;
+            left: 5px;
+        }
+
+        .tree-leaves::after {
+            top: 10px;
+            right: -15px;
+        }
+
+        .tree:nth-child(2) {
+            left: 15%;
+        }
+
+        .tree:nth-child(3) {
+            right: 18%;
+            transform: scale(0.8);
+        }
+
+        .tree:nth-child(4) {
+            left: 35%;
+            transform: scale(0.7);
+        }
+
+        .flower {
+            position: absolute;
+            bottom: 20px;
+        }
+
+        .flower-stem {
+            width: 3px;
+            height: 25px;
+            background: #558B2F;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .flower-petals {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .petal {
+            width: 8px;
+            height: 8px;
+            background: #C4A57B;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .petal:nth-child(1) { transform: translate(-50%, -12px); }
+        .petal:nth-child(2) { transform: translate(4px, -8px); }
+        .petal:nth-child(3) { transform: translate(8px, 0); }
+        .petal:nth-child(4) { transform: translate(4px, 8px); }
+        .petal:nth-child(5) { transform: translate(-50%, 12px); }
+        .petal:nth-child(6) { transform: translate(-12px, 8px); }
+        .petal:nth-child(7) { transform: translate(-16px, 0); }
+        .petal:nth-child(8) { transform: translate(-12px, -8px); }
+
+        .flower-center {
+            width: 6px;
+            height: 6px;
+            background: #FFD54F;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .flower:nth-child(5) {
+            left: 25%;
+        }
+
+        .flower:nth-child(6) {
+            left: 45%;
+        }
+
+        .flower:nth-child(6) .petal {
+            background: #A0826D;
+        }
+
+        .flower:nth-child(7) {
+            right: 30%;
+        }
+
+        .flower:nth-child(7) .petal {
+            background: #8B7355;
+        }
+
+        .flower:nth-child(8) {
+            right: 15%;
+            transform: scale(0.8);
+        }
+
+        .flower:nth-child(8) .petal {
+            background: #6D5A43;
+        }
+        
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.9;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 80px;
+            height: 30px;
+            top: 20px;
+            left: 10%;
+        }
+
+        .cloud-1::before {
+            width: 40px;
+            height: 40px;
+            top: -15px;
+            left: 15px;
+        }
+
+        .cloud-1::after {
+            width: 30px;
+            height: 30px;
+            top: -10px;
+            right: 15px;
+        }
+
+        .cloud-2 {
+            width: 60px;
+            height: 25px;
+            top: 40px;
+            right: 20%;
+        }
+
+        .cloud-2::before {
+            width: 35px;
+            height: 35px;
+            top: -12px;
+            left: 10px;
+        }
+
+        .cloud-2::after {
+            width: 25px;
+            height: 25px;
+            top: -8px;
+            right: 12px;
+        }
+
+        .hole-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 0;
+        }
+
+        .hole {
+            width: 300px;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.03) 2px,
+                    rgba(0, 0, 0, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.03) 2px,
+                    rgba(0, 0, 0, 0.03) 4px
+                ),
+                linear-gradient(
+                    to bottom,
+                    #8B6F47 0%,
+                    #6B4423 15%,
+                    #5D3A1A 30%,
+                    #4A2F1A 50%,
+                    #3D2415 70%,
+                    #2B1810 100%
+                ),
+                radial-gradient(circle at 20% 30%, rgba(139, 111, 71, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 60%, rgba(92, 64, 51, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(61, 36, 21, 0.3) 0%, transparent 45%);
+            border: 3px solid #3d2415;
+            border-radius: 0;
+            position: relative;
+            box-shadow: 
+                inset 0 5px 20px rgba(0, 0, 0, 0.6),
+                inset -3px 0 10px rgba(0, 0, 0, 0.4),
+                inset 3px 0 10px rgba(0, 0, 0, 0.4);
+            transition: height 0.5s ease;
+        }
+        
+        .hole::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(139, 111, 71, 0.2) 1px, transparent 1px),
+                radial-gradient(circle at 85% 35%, rgba(107, 68, 35, 0.25) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 45% 55%, rgba(92, 64, 51, 0.2) 1px, transparent 1px),
+                radial-gradient(circle at 70% 75%, rgba(74, 47, 26, 0.3) 2px, transparent 2px),
+                radial-gradient(circle at 25% 85%, rgba(61, 36, 21, 0.25) 1px, transparent 1px),
+                radial-gradient(circle at 90% 15%, rgba(139, 111, 71, 0.15) 1.5px, transparent 1.5px);
+            background-size: 80px 80px, 120px 120px, 100px 100px, 90px 90px, 110px 110px, 95px 95px;
+            background-position: 0 0, 40px 40px, 20px 60px, 60px 20px, 30px 80px, 70px 10px;
+            pointer-events: none;
+        }
+
+        .hole-opening {
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            height: 20px;
+            background: 
+                linear-gradient(to bottom, #6B4423 0%, #3d2415 100%),
+                radial-gradient(circle at 30% 50%, rgba(139, 111, 71, 0.2) 0%, transparent 50%);
+            border: 3px solid #3d2415;
+            border-radius: 0;
+            box-shadow: 
+                inset 0 3px 10px rgba(0, 0, 0, 0.7),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+
+
+        .bottom-indicator {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .stick-figure {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+        }
+
+        .stick-figure .head {
+            width: 15px;
+            height: 15px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stick-figure .body {
+            width: 2px;
+            height: 20px;
+            background: #fff;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 17px;
+        }
+
+        .stick-figure .arm-left,
+        .stick-figure .arm-right {
+            width: 12px;
+            height: 2px;
+            background: #fff;
+            position: absolute;
+            top: 25px;
+        }
+
+        .stick-figure .arm-left {
+            left: 2px;
+            transform: rotate(-30deg);
+            transform-origin: right center;
+        }
+
+        .stick-figure .arm-right {
+            right: 2px;
+            transform: rotate(30deg);
+            transform-origin: left center;
+        }
+
+        .stick-figure .leg-left,
+        .stick-figure .leg-right {
+            width: 15px;
+            height: 2px;
+            background: #fff;
+            position: absolute;
+            top: 37px;
+        }
+
+        .stick-figure .leg-left {
+            left: 7px;
+            transform: rotate(30deg);
+            transform-origin: top left;
+        }
+
+        .stick-figure .leg-right {
+            right: 7px;
+            transform: rotate(-30deg);
+            transform-origin: top right;
+        }
+
+        .info {
+            text-align: center;
+            margin-bottom: 60px;
+            color: #000000;
+            font-style: italic;
+            font-size: 1.5em;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive;
+        }
+
+        .diary-section {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #000000;
+        }
+
+        .diary-section h2 {
+            color: #000000;
+            margin-bottom: 40px;
+            font-size: 1.8em;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            text-transform: lowercase;
+        }
+
+        .diary-entries {
+            max-height: 600px;
+            overflow-y: auto;
+            background: transparent;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .diary-entries::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .diary-entries::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .diary-entries::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 0;
+        }
+
+        .diary-entry {
+            background: #fafafa;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 0;
+            border-left: 2px solid #000000;
+            box-shadow: none;
+            transition: all 0.2s ease;
+        }
+
+        .diary-entry:hover {
+            transform: none;
+            box-shadow: none;
+            background: #f5f5f5;
+        }
+
+        .diary-entry .date {
+            color: #666666;
+            font-size: 0.85em;
+            margin-bottom: 12px;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .diary-entry .depth-info {
+            font-size: 1.1em;
+            color: #000000;
+            font-weight: 400;
+            margin-bottom: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .entry-message {
+            font-size: 0.95em;
+            color: #333333;
+            font-style: italic;
+            line-height: 1.7;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-weight: 300;
+        }
+
+        .no-entries {
+            text-align: center;
+            color: #999999;
+            padding: 60px;
+            font-style: normal;
+            font-size: 1em;
+            font-weight: 300;
+        }
+
+        .clear-button {
+            padding: 10px 24px;
+            font-size: 0.85em;
+            background: transparent;
+            color: #000000;
+            border: 1px solid #cccccc;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            margin-top: 30px;
+            box-shadow: none;
+            letter-spacing: 0.05em;
+            text-transform: lowercase;
+        }
+
+        .clear-button:hover {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            background: #000000;
+            color: #ffffff;
+            padding: 16px 32px;
+            border-radius: 0;
+            box-shadow: none;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            z-index: 1000;
+            font-weight: 400;
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+            text-transform: lowercase;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info">
+            how deep is your hole right now?
+        </div>
+        
+        <div class="controls">
+            <div class="hole-input-row">
+                <label for="depth">My Hole:</label>
+                <input type="number" id="depth" min="1" max="100" value="10">
+                <span style="color: #666;">ft</span>
+            </div>
+            <button class="save-button" id="saveButton">Add to Diary</button>
+        </div>
+
+        <div class="depth-display">
+            Current Depth: <span id="currentDepth">10</span> feet
+        </div>
+
+        <div class="visualization">
+            <div class="ground-layer">
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+                <div class="grass-layer">
+                    <div class="grass-blades"></div>
+                </div>
+                <div class="tree">
+                    <div class="tree-trunk"></div>
+                    <div class="tree-leaves"></div>
+                </div>
+                <div class="tree">
+                    <div class="tree-trunk"></div>
+                    <div class="tree-leaves"></div>
+                </div>
+                <div class="tree">
+                    <div class="tree-trunk"></div>
+                    <div class="tree-leaves"></div>
+                </div>
+                <div class="flower">
+                    <div class="flower-stem"></div>
+                    <div class="flower-petals">
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="flower-center"></div>
+                    </div>
+                </div>
+                <div class="flower">
+                    <div class="flower-stem"></div>
+                    <div class="flower-petals">
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="flower-center"></div>
+                    </div>
+                </div>
+                <div class="flower">
+                    <div class="flower-stem"></div>
+                    <div class="flower-petals">
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="flower-center"></div>
+                    </div>
+                </div>
+                <div class="flower">
+                    <div class="flower-stem"></div>
+                    <div class="flower-petals">
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="petal"></div>
+                        <div class="flower-center"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hole-container">
+                <div style="position: relative;">
+                    <div class="hole" id="hole">
+                        <div class="hole-opening"></div>
+                        <div class="stick-figure">
+                            <div class="head"></div>
+                            <div class="body"></div>
+                            <div class="arm-left"></div>
+                            <div class="arm-right"></div>
+                            <div class="leg-left"></div>
+                            <div class="leg-right"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diary-section">
+            <h2>Hole Diary</h2>
+            <div class="diary-entries" id="diaryEntries">
+                <div class="no-entries">No entries yet. Add your first hole depth!</div>
+            </div>
+            <button class="clear-button" id="clearButton" style="display: none;">Clear All Entries</button>
+        </div>
+    </div>
+
+    <script>
+        const depthInput = document.getElementById('depth');
+        const hole = document.getElementById('hole');
+        const currentDepthSpan = document.getElementById('currentDepth');
+        const saveButton = document.getElementById('saveButton');
+        const diaryEntries = document.getElementById('diaryEntries');
+        const clearButton = document.getElementById('clearButton');
+
+        // Load diary entries from localStorage
+        let entries = JSON.parse(localStorage.getItem('holeDiaryEntries')) || [];
+
+        function updateHole() {
+            let depth = parseInt(depthInput.value);
+            
+            // Validate input
+            if (isNaN(depth) || depth < 1) {
+                depth = 1;
+                depthInput.value = 1;
+            } else if (depth > 100) {
+                depth = 100;
+                depthInput.value = 100;
+            }
+
+            // Update display
+            currentDepthSpan.textContent = depth;
+
+            // Calculate height (5 pixels per foot for larger visualization)
+            const pixelHeight = depth * 5;
+            hole.style.height = pixelHeight + 'px';
+        }
+
+        function formatDate(date) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function generateMotivationalText(depth) {
+            if (depth <= 5) {
+                const messages = [
+                    "Even a gentle rain can nourish the earth. Small troubles pass like clouds. — Lao Tzu",
+                    "This too shall pass. The lightest burdens teach us to walk with grace. — Persian Proverb",
+                    "In every walk with nature, one receives far more than he seeks. Rest easy. — John Muir",
+                    "The world is full of magic things, patiently waiting for our senses to grow sharper. — W.B. Yeats",
+                    "Sometimes the smallest things take up the most room in your heart. Be gentle with yourself. — A.A. Milne"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            } else if (depth <= 15) {
+                const messages = [
+                    "The gem cannot be polished without friction. You are being shaped, not broken. — Chinese Proverb",
+                    "Smooth seas do not make skillful sailors. These waters are teaching you. — African Proverb",
+                    "What doesn't kill you makes you stronger. But it's okay to rest while healing. — Friedrich Nietzsche",
+                    "The darker the night, the brighter the stars. Look up when you can. — Fyodor Dostoevsky",
+                    "Rock bottom became the solid foundation on which I rebuilt my life. — J.K. Rowling"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            } else if (depth <= 30) {
+                const messages = [
+                    "In the middle of difficulty lies opportunity. You are stronger than you know. — Albert Einstein",
+                    "The oak fought the wind and was broken, the willow bent and survived. Bend, don't break. — Japanese Proverb",
+                    "We must embrace pain and burn it as fuel for our journey. You are not your struggles. — Kenji Miyazawa",
+                    "When you come out of the storm, you won't be the same person who walked in. — Haruki Murakami",
+                    "It is during our darkest moments that we must focus to see the light. — Aristotle"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            } else if (depth <= 50) {
+                const messages = [
+                    "The wound is the place where the light enters you. Your pain has meaning. — Rumi",
+                    "Out of suffering have emerged the strongest souls. You are being transformed. — Kahlil Gibran",
+                    "Turn your wounds into wisdom. Every scar tells a story of survival. — Oprah Winfrey",
+                    "Although the world is full of suffering, it is also full of the overcoming of it. — Helen Keller",
+                    "The lotus flower blooms most beautifully from the deepest and thickest mud. — Buddhist Proverb"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            } else if (depth <= 75) {
+                const messages = [
+                    "In the depth of winter, I finally learned that within me there lay an invincible summer. — Albert Camus",
+                    "There is a crack in everything. That's how the light gets in. You are not broken beyond repair. — Leonard Cohen",
+                    "Pain is inevitable. Suffering is optional. You are learning to choose. — Haruki Murakami",
+                    "The deeper that sorrow carves into your being, the more joy you can contain. — Kahlil Gibran",
+                    "I am not what happened to me. I am what I choose to become. — Carl Jung"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            } else {
+                const messages = [
+                    "If you're going through hell, keep going. You have endured what would destroy most. — Winston Churchill",
+                    "Rock bottom has a foundation. You can rebuild from here. You are still here. — J.K. Rowling",
+                    "The night is darkest just before the dawn. Hold on. The light will come. — Thomas Fuller",
+                    "Hope is being able to see that there is light despite all of the darkness. — Desmond Tutu",
+                    "You are braver than you believe, stronger than you seem, and smarter than you think. — A.A. Milne"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            }
+        }
+
+        function showSuccessMessage() {
+            const message = document.createElement('div');
+            message.className = 'success-message';
+            message.textContent = '✓ Added to diary!';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+
+        function saveDiaryEntry() {
+            const depth = parseInt(depthInput.value);
+            const now = new Date();
+            
+            const entry = {
+                depth: depth,
+                timestamp: now.toISOString(),
+                formattedDate: formatDate(now),
+                message: generateMotivationalText(depth)
+            };
+            
+            entries.unshift(entry); // Add to beginning of array
+            localStorage.setItem('holeDiaryEntries', JSON.stringify(entries));
+            
+            displayDiaryEntries();
+            showSuccessMessage();
+        }
+
+        function displayDiaryEntries() {
+            if (entries.length === 0) {
+                diaryEntries.innerHTML = '<div class="no-entries">No entries yet. Add your first hole depth!</div>';
+                clearButton.style.display = 'none';
+                return;
+            }
+            
+            clearButton.style.display = 'block';
+            
+            diaryEntries.innerHTML = entries.map(entry => `
+                <div class="diary-entry">
+                    <div class="date">${entry.formattedDate}</div>
+                    <div class="depth-info">My Hole: ${entry.depth} feet</div>
+                    ${entry.message ? `<div class="entry-message">${entry.message}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function clearAllEntries() {
+            if (confirm('Are you sure you want to clear all diary entries?')) {
+                entries = [];
+                localStorage.removeItem('holeDiaryEntries');
+                displayDiaryEntries();
+            }
+        }
+
+        // Event listeners
+        depthInput.addEventListener('input', updateHole);
+        depthInput.addEventListener('change', updateHole);
+        saveButton.addEventListener('click', saveDiaryEntry);
+        clearButton.addEventListener('click', clearAllEntries);
+
+        // Initialize
+        updateHole();
+        displayDiaryEntries();
+    </script>
+</body>
+</html>
