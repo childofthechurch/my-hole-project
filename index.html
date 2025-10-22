@@ -83,6 +83,65 @@
             align-items: center;
         }
 
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 2px;
+            background: #ddd;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #000000;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #333;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #000000;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            background: #333;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: -5px;
+        }
+
         label {
             font-size: 1em;
             color: #000000;
@@ -763,7 +822,12 @@
             <div class="hole-input-row">
                 <label for="depth">My Hole:</label>
                 <input type="number" id="depth" min="1" max="100" value="10">
-                <span style="color: #666;">ft</span>
+               <span style="color: #666;">ft</span>
+             </div>
+            <div class="slider-container">
+                <span style="color: #666; font-size: 0.9em;">1 ft</span>
+                <input type="range" id="depthSlider" min="1" max="100" value="10">
+                <span style="color: #666; font-size: 0.9em;">100 ft</span>
             </div>
             <button class="save-button" id="saveButton">Add to Diary</button>
         </div>
@@ -877,6 +941,7 @@
 
     <script>
         const depthInput = document.getElementById('depth');
+        const depthSlider = document.getElementById('depthSlider');
         const hole = document.getElementById('hole');
         const currentDepthSpan = document.getElementById('currentDepth');
         const saveButton = document.getElementById('saveButton');
@@ -1031,9 +1096,22 @@
             }
         }
 
+        // Sync slider with number input
+        function syncFromInput() {
+            depthSlider.value = depthInput.value;
+            updateHole();
+        }
+
+        function syncFromSlider() {
+            depthInput.value = depthSlider.value;
+            updateHole();
+        }
+
         // Event listeners
-        depthInput.addEventListener('input', updateHole);
-        depthInput.addEventListener('change', updateHole);
+        depthInput.addEventListener('input', syncFromInput);
+        depthInput.addEventListener('change', syncFromInput);
+        depthSlider.addEventListener('input', syncFromSlider);
+        depthSlider.addEventListener('change', syncFromSlider);
         saveButton.addEventListener('click', saveDiaryEntry);
         clearButton.addEventListener('click', clearAllEntries);
 
