@@ -65,8 +65,8 @@
 
         .controls {
             display: flex;
-            gap: 30px;
-            align-items: center;
+            gap: 60px;
+            align-items: flex-start;
             justify-content: center;
             margin-bottom: 80px;
             flex-wrap: wrap;
@@ -74,7 +74,13 @@
             background: transparent;
             border-radius: 0;
             box-shadow: none;
+        }
+
+        .controls-left {
+            display: flex;
             flex-direction: column;
+            gap: 30px;
+            align-items: center;
         }
 
         .hole-input-row {
@@ -89,6 +95,20 @@
             gap: 15px;
             width: 100%;
             max-width: 400px;
+        }
+
+        .hole-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            line-height: 0;
+        }
+
+        .hole-preview-label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 400;
         }
 
         input[type="range"] {
@@ -249,6 +269,7 @@
             width: 300px;
             margin-left: auto;
             margin-right: auto;
+            display: block;
         }
 
         .grass-layer {
@@ -482,12 +503,13 @@
         .hole-container {
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             margin-top: 0;
         }
 
         .hole {
             width: 300px;
-            background: 
+            background:
                 repeating-linear-gradient(
                     0deg,
                     transparent,
@@ -517,11 +539,12 @@
             border: 3px solid #3d2415;
             border-radius: 0;
             position: relative;
-            box-shadow: 
+            box-shadow:
                 inset 0 5px 20px rgba(0, 0, 0, 0.6),
                 inset -3px 0 10px rgba(0, 0, 0, 0.4),
                 inset 3px 0 10px rgba(0, 0, 0, 0.4);
             transition: height 0.5s ease;
+            margin-top: -23px;
         }
         
         .hole::before {
@@ -819,116 +842,118 @@
         </div>
         
         <div class="controls">
-            <div class="hole-input-row">
-                <label for="depth">My Hole:</label>
-                <input type="number" id="depth" min="1" max="100" value="10">
-               <span style="color: #666;">ft</span>
-             </div>
-            <div class="slider-container">
-                <span style="color: #666; font-size: 0.9em;">1 ft</span>
-                <input type="range" id="depthSlider" min="1" max="100" value="10">
-                <span style="color: #666; font-size: 0.9em;">100 ft</span>
+            <div class="controls-left">
+                <div class="hole-input-row">
+                    <label for="depth">My Hole:</label>
+                    <input type="number" id="depth" min="1" max="100" value="10">
+                   <span style="color: #666;">ft</span>
+                 </div>
+                <div class="slider-container">
+                    <span style="color: #666; font-size: 0.9em;">1 ft</span>
+                    <input type="range" id="depthSlider" min="1" max="100" value="10">
+                    <span style="color: #666; font-size: 0.9em;">100 ft</span>
+                </div>
+                <button class="save-button" id="saveButton">Add to Diary</button>
             </div>
-            <button class="save-button" id="saveButton">Add to Diary</button>
+
+            <div class="hole-preview">
+                <div class="ground-layer">
+                    <div class="cloud cloud-1"></div>
+                    <div class="cloud cloud-2"></div>
+                    <div class="grass-layer">
+                        <div class="grass-blades"></div>
+                    </div>
+                    <div class="tree">
+                        <div class="tree-trunk"></div>
+                        <div class="tree-leaves"></div>
+                    </div>
+                    <div class="tree">
+                        <div class="tree-trunk"></div>
+                        <div class="tree-leaves"></div>
+                    </div>
+                    <div class="tree">
+                        <div class="tree-trunk"></div>
+                        <div class="tree-leaves"></div>
+                    </div>
+                    <div class="flower">
+                        <div class="flower-stem"></div>
+                        <div class="flower-petals">
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="flower-center"></div>
+                        </div>
+                    </div>
+                    <div class="flower">
+                        <div class="flower-stem"></div>
+                        <div class="flower-petals">
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="flower-center"></div>
+                        </div>
+                    </div>
+                    <div class="flower">
+                        <div class="flower-stem"></div>
+                        <div class="flower-petals">
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="flower-center"></div>
+                        </div>
+                    </div>
+                    <div class="flower">
+                        <div class="flower-stem"></div>
+                        <div class="flower-petals">
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="petal"></div>
+                            <div class="flower-center"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hole-container">
+                    <div style="position: relative;">
+                        <div class="hole" id="hole">
+                            <div class="hole-opening"></div>
+                            <div class="stick-figure">
+                                <div class="head"></div>
+                                <div class="body"></div>
+                                <div class="arm-left"></div>
+                                <div class="arm-right"></div>
+                                <div class="leg-left"></div>
+                                <div class="leg-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="depth-display">
             Current Depth: <span id="currentDepth">10</span> feet
         </div>
 
-        <div class="visualization">
-            <div class="ground-layer">
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="grass-layer">
-                    <div class="grass-blades"></div>
-                </div>
-                <div class="tree">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves"></div>
-                </div>
-                <div class="tree">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves"></div>
-                </div>
-                <div class="tree">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves"></div>
-                </div>
-                <div class="flower">
-                    <div class="flower-stem"></div>
-                    <div class="flower-petals">
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="flower-center"></div>
-                    </div>
-                </div>
-                <div class="flower">
-                    <div class="flower-stem"></div>
-                    <div class="flower-petals">
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="flower-center"></div>
-                    </div>
-                </div>
-                <div class="flower">
-                    <div class="flower-stem"></div>
-                    <div class="flower-petals">
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="flower-center"></div>
-                    </div>
-                </div>
-                <div class="flower">
-                    <div class="flower-stem"></div>
-                    <div class="flower-petals">
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="petal"></div>
-                        <div class="flower-center"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="hole-container">
-                <div style="position: relative;">
-                    <div class="hole" id="hole">
-                        <div class="hole-opening"></div>
-                        <div class="stick-figure">
-                            <div class="head"></div>
-                            <div class="body"></div>
-                            <div class="arm-left"></div>
-                            <div class="arm-right"></div>
-                            <div class="leg-left"></div>
-                            <div class="leg-right"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="diary-section">
             <h2>Hole Diary</h2>
